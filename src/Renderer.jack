@@ -1,0 +1,98 @@
+class Renderer {
+    field int cx;
+    field int cy;
+    field boolean inverted;
+    field int delay;
+
+    constructor Renderer new(int initialDelay) {
+        let cx = 256;
+        let cy = 128;
+        let inverted = false;
+        let delay = initialDelay;
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void toggleInvert() {
+        let inverted = ~inverted;
+        return;
+    }
+
+    method int getDelay() { return delay; }
+    method boolean isInverted() { return inverted; }
+
+    method void drawPoint(int x, int y) {
+        if (x < 1) { return; }
+        if (y < 1) { return; }
+        if (x > 510) { return; }
+        if (y > 254) { return; }
+        do Screen.drawPixel(x, y);
+        do Screen.drawPixel(x + 1, y);
+        do Screen.drawPixel(x, y + 1);
+        do Screen.drawPixel(x + 1, y + 1);
+        return;
+    }
+
+    method void drawSymmetric(int x, int y, int symmetry) {
+        do Screen.setColor(~inverted);
+        do drawPoint(cx + x, cy + y);
+        do drawPoint(cx - x, cy + y);
+        do drawPoint(cx + x, cy - y);
+        do drawPoint(cx - x, cy - y);
+        if (symmetry = 8) {
+            do drawPoint(cx + y, cy + x);
+            do drawPoint(cx - y, cy + x);
+            do drawPoint(cx + y, cy - x);
+            do drawPoint(cx - y, cy - x);
+        }
+        return;
+    }
+
+    method void printSpeed() {
+        if (inverted) { return; }
+        do Output.moveCursor(1, 0);
+        do Output.printString("Delay:");
+        do Output.printInt(delay);
+        do Output.printString("   ");
+        return;
+    }
+
+    method int render(Pattern p) {
+        var int t;
+        var int x;
+        var int y;
+        var char key;
+        let t = 0;
+
+        if (inverted) {
+            do Screen.setColor(true);
+            do Screen.drawRectangle(0, 0, 511, 255);
+        }
+
+        while (t < p.getSteps()) {
+            let x = p.getX(t);
+            let y = p.getY(t);
+            do drawSymmetric(x, y, p.getSymmetry());
+            do Sys.wait(delay);
+            let key = Keyboard.keyPressed();
+            if (key = 32) { return 1; }
+            if (key = 73) { return 2; }
+            if (key = 81) { 
+                if (delay > 3) { 
+                    let delay = delay - 3; 
+                    do printSpeed();
+                } 
+            }
+            if (key = 87) { 
+                let delay = delay + 3; 
+                do printSpeed();
+            }
+            let t = t + 1;
+        }
+        return 0;
+    }
+}
