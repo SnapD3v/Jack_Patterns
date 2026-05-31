@@ -1,0 +1,66 @@
+class Pattern {
+    field int paramA;
+    field int paramB;
+    field int scale;
+    field int steps;
+    field int symmetry;
+
+    constructor Pattern new() {
+        do reset(1);
+        return this;
+    }
+
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+
+    method void reset(int seed) {
+        let paramA = 2 + (seed & 11);
+        let paramB = 3 + ((seed / 8) & 13);
+        let scale = 1;
+        let steps = 400 + ((seed & 7) * 50);
+        let symmetry = 4 + ((seed / 32) & 1) * 4;
+        return;
+    }
+
+    method int getSteps() { return steps; }
+    method int getSymmetry() { return symmetry; }
+
+    method int getX(int t) {
+        var int r;
+        var int angle;
+        let r = t / 5;
+        let angle = t * paramA;
+        // cos аппроксимация: r * cos(angle) через квадратичную формулу
+        let angle = angle - ((angle / 360) * 360);
+        if (angle < 90) {
+            return r * (90 - angle) / 90;
+        }
+        if (angle < 180) {
+            return r * (angle - 90) / (-90);
+        }
+        if (angle < 270) {
+            return r * (angle - 180) / (-90);
+        }
+        return r * (360 - angle) / 90;
+    }
+
+    method int getY(int t) {
+        var int r;
+        var int angle;
+        let r = t / 5;
+        let angle = t * paramB;
+        let angle = angle - ((angle / 360) * 360);
+        if (angle < 90) {
+            return r * angle / 90;
+        }
+        if (angle < 180) {
+            return r * (180 - angle) / 90;
+        }
+        if (angle < 270) {
+            return r * (angle - 180) / (-90);
+        }
+        return r * (angle - 270) / (-90);
+    }
+}

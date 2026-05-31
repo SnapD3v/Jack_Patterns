@@ -1,0 +1,59 @@
+class Main {
+    function void main() {
+        var Pattern p;
+        var Renderer r;
+        var int seed;
+        var int patternNum;
+        var int result;
+        var char key;
+
+        let r = Renderer.new(1);
+        let p = Pattern.new();
+        let seed = 1;
+        let patternNum = 1;
+
+        while (true) {
+            do Screen.clearScreen();
+            do p.reset(seed);
+            do Main.printStatus(patternNum, r);
+            let result = r.render(p);
+
+            if (result = 2) {
+                do r.toggleInvert();
+            }
+
+            if (result = 0) {
+                let key = 0;
+                while (~(key = 32)) {
+                    let key = Keyboard.keyPressed();
+                    if (key = 73) {
+                        do r.toggleInvert();
+                    }
+                    do Sys.wait(50);
+                }
+            }
+
+            let seed = seed + 17;
+            let patternNum = patternNum + 1;
+        }
+
+        return;
+    }
+
+    function void printStatus(int patternNum, Renderer r) {
+        if (r.isInverted()) { return; }
+        do Output.moveCursor(0, 0);
+        do Output.printString("Pattern:");
+        do Output.printInt(patternNum);
+        do Output.printString("   ");
+        do Output.moveCursor(1, 0);
+        do Output.printString("Delay:");
+        do Output.printInt(r.getDelay());
+        do Output.printString("   ");
+        do Output.moveCursor(2, 0);
+        do Output.printString("Space-New  I-Inverse");
+        do Output.moveCursor(3, 0);
+        do Output.printString("Q-Faster  W-Slower");
+        return;
+    }
+}
