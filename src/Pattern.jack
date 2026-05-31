@@ -32,7 +32,6 @@ class Pattern {
         var int angle;
         let r = t / 5;
         let angle = t * paramA;
-        // cos аппроксимация: r * cos(angle) через квадратичную формулу
         let angle = angle - ((angle / 360) * 360);
         if (angle < 90) {
             return r * (90 - angle) / 90;
